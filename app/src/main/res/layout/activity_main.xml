@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_glass_gradient"
+    tools:context=".MainActivity">
+
+    <!-- Pulsante di Logout in alto a destra -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/btnLogout"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="24dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        app:cardBackgroundColor="#33FFFFFF"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="0dp"
+        app:strokeColor="#80FFFFFF"
+        app:strokeWidth="1.5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_logout"
+            app:tint="#FFFFFF" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Card contenitore in Vetro Liquido (Glassmorphism) -->
+    <!-- app:cardElevation="0dp" è CRUCIALE per non rovinare la trasparenza con ombre nere solide -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/imageContainer"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_marginTop="32dp"
+        app:cardBackgroundColor="#33FFFFFF" 
+        app:cardCornerRadius="125dp"
+        app:cardElevation="0dp" 
+        app:layout_constraintBottom_toTopOf="@+id/statusLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:strokeColor="#80FFFFFF" 
+        app:strokeWidth="1.5dp">
+
+        <ImageView
+            android:id="@+id/imageViewMascotte"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_gravity="center"
+            android:contentDescription="Mascotte della serra"
+            android:scaleType="fitCenter"
+            android:src="@mipmap/normale" />
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Layout di Status -->
+    <LinearLayout
+        android:id="@+id/statusLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/humidityCard"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageContainer">
+
+        <ImageView
+            android:id="@+id/imageStatus"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginEnd="6dp"
+            android:src="@drawable/ic_check_circle"
+            app:tint="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/statusText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="0.02"
+            android:text="TUTTO BENE"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <!-- Card principale Umidità in Vetro Smerigliato -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/humidityCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginTop="24dp"
+        app:cardBackgroundColor="#4DFFFFFF" 
+        app:cardCornerRadius="32dp"
+        app:cardElevation="0dp"
+        app:strokeColor="#B3FFFFFF" 
+        app:strokeWidth="1.5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/statusLayout">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingBottom="24dp"
+            android:paddingTop="24dp">
+
+            <TextView
+                android:id="@+id/textPercentualeUmid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:includeFontPadding="false"
+                android:shadowColor="#26000000"
+                android:shadowDx="0"
+                android:shadowDy="4"
+                android:shadowRadius="10"
+                android:text="80%"
+                android:textColor="#FFFFFF"
+                android:textSize="58sp" />
+
+            <TextView
+                android:id="@+id/textLabelUmid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Umidità Attuale"
+                android:textColor="#E0F2F1" 
+                android:textSize="16sp"
+                android:letterSpacing="0.05"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Contenitore con Bottoni sovrapposti per Irrigazione -->
+    <FrameLayout
+        android:id="@+id/layoutIrrigazioneContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginTop="48dp"
+        app:layout_constraintBottom_toTopOf="@+id/layoutAutoContainer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/humidityCard">
+
+        <!-- Bottone 1: Attiva Irrigazione (Bianco su Vetro - Default) -->
+
+        <!-- Bottone 2: Disattiva Irrigazione (Rosso/Stop - Nascosto di default) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnIrrigazioneON"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="Attiva Irrigazione"
+            android:textAllCaps="false"
+            android:textColor="#0F8B7D"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:backgroundTint="#FFFFFF"
+            app:cornerRadius="32dp"
+            app:icon="@drawable/ic_water_drop"
+            app:iconGravity="textStart"
+            app:iconPadding="12dp"
+            app:iconTint="#0F8B7D" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnIrrigazioneOFF"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="Ferma Irrigazione"
+            android:textAllCaps="false"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF" 
+            android:visibility="gone"
+            app:backgroundTint="#99FF3B30" 
+            app:cornerRadius="32dp"
+            app:icon="@drawable/ic_stop"
+            app:iconGravity="textStart"
+            app:iconPadding="12dp"
+            app:iconTint="#FFFFFF"
+            app:strokeColor="#FF3B30"
+            app:strokeWidth="1.5dp" />
+
+    </FrameLayout>
+
+    <!-- Contenitore con Bottoni sovrapposti per lo Status AUTO (ON/OFF) -->
+    <FrameLayout
+        android:id="@+id/layoutAutoContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="48dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layoutIrrigazioneContainer">
+
+        <!-- Bottone 1: SPENTO (Auto OFF) -->
+
+        <!-- Bottone 2: ACCESO (Auto ON) - Nascosto di default.
+             Modificato per suggerire l'azione di Pausa (Rosso) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAutoOFF"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="Auto OFF"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:backgroundTint="#1A000000"
+            app:cornerRadius="32dp"
+            app:icon="@drawable/ic_power"
+            app:iconGravity="textStart"
+            app:iconPadding="12dp"
+            app:iconTint="#FFFFFF"
+            app:strokeColor="#80FFFFFF"
+            app:strokeWidth="1.5dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAutoON"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:insetBottom="0dp"
+            android:insetTop="0dp"
+            android:text="Auto ON"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF" 
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:backgroundTint="#99FF3B30" 
+            app:cornerRadius="32dp"
+            app:icon="@drawable/ic_pause"
+            app:iconGravity="textStart"
+            app:iconPadding="12dp"
+            app:iconTint="#FFFFFF"
+            app:strokeColor="#FF3B30"
+            app:strokeWidth="1.5dp" />
+
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,43 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Base / Pavimento -->
+    <path
+        android:strokeColor="#000000"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M2,21 L22,21" />
+
+    <!-- Cupola Esterna -->
+    <path
+        android:strokeColor="#000000"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M3,21 A9,18 0 0,1 21,21" />
+
+    <!-- Linee strutturali verticali (effetto 3D/vetrata) -->
+    <path
+        android:strokeColor="#000000"
+        android:strokeWidth="1.2"
+        android:pathData="M7.5,21 A4.5,18 0 0,1 12,3 M16.5,21 A4.5,18 0 0,0 12,3" />
+
+    <!-- Porta ad arco -->
+    <path
+        android:strokeColor="#000000"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M9,21 V14 A3,3 0 0,1 15,14 V21" />
+
+    <!-- Piccola pianticella all'interno (gambo e foglie) -->
+    <path
+        android:strokeColor="#000000"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M12,21 V16 M12,19 L10,17 M12,18 L14,15 M10.5,21 V19 M10.5,20 L9.5,18" />
+
+</vector>

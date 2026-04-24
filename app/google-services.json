@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "96873550051",
+    "project_id": "smartgreenhouse-e3a04",
+    "storage_bucket": "smartgreenhouse-e3a04.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:96873550051:android:0942f211abf84ded4c35d6",
+        "android_client_info": {
+          "package_name": "com.example.smart_greenhouse"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBo35yhCSsXfgTn30TQhq3yWoPpTU9lYhc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
