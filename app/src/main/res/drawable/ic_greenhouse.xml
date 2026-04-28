@@ -4,40 +4,26 @@
     android:viewportWidth="24"
     android:viewportHeight="24">
 
-    <!-- Base / Pavimento -->
-    <path
-        android:strokeColor="#000000"
-        android:strokeWidth="2"
-        android:strokeLineCap="round"
-        android:pathData="M2,21 L22,21" />
-
-    <!-- Cupola Esterna -->
-    <path
-        android:strokeColor="#000000"
-        android:strokeWidth="2"
-        android:strokeLineCap="round"
-        android:pathData="M3,21 A9,18 0 0,1 21,21" />
-
-    <!-- Linee strutturali verticali (effetto 3D/vetrata) -->
+    <!-- Stelo principale -->
     <path
         android:strokeColor="#000000"
         android:strokeWidth="1.2"
-        android:pathData="M7.5,21 A4.5,18 0 0,1 12,3 M16.5,21 A4.5,18 0 0,0 12,3" />
-
-    <!-- Porta ad arco -->
-    <path
-        android:strokeColor="#000000"
-        android:strokeWidth="2"
         android:strokeLineCap="round"
-        android:fillColor="#00000000"
-        android:pathData="M9,21 V14 A3,3 0 0,1 15,14 V21" />
+        android:pathData="M12,20 L12,14" />
 
-    <!-- Piccola pianticella all'interno (gambo e foglie) -->
+    <!-- Foglia centrale (quella più alta) -->
     <path
-        android:strokeColor="#000000"
-        android:strokeWidth="1.5"
-        android:strokeLineCap="round"
-        android:strokeLineJoin="round"
-        android:pathData="M12,21 V16 M12,19 L10,17 M12,18 L14,15 M10.5,21 V19 M10.5,20 L9.5,18" />
+        android:fillColor="#000000"
+        android:pathData="M12,14 C12,14 14,12 14,9 C14,6 12,4 12,4 C12,4 10,6 10,9 C10,12 12,14 12,14 Z" />
+
+    <!-- Foglia sinistra (incurvata) -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M11,16 C11,16 9,15.5 7,13.5 C5,11.5 5,9 5,9 C5,9 8,8.5 10,11.5 C12,14.5 11,16 11,16 Z" />
+
+    <!-- Foglia destra (incurvata) -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M13,16 C13,16 15,15.5 17,13.5 C19,11.5 19,9 19,9 C19,9 16,8.5 14,11.5 C12,14.5 13,16 13,16 Z" />
 
 </vector>

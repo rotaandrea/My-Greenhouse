@@ -7,7 +7,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -19,6 +23,8 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
+
         fAuth=FirebaseAuth.getInstance();
         if(fAuth.getCurrentUser()!=null){
             startActivity(new Intent(getApplicationContext(), MainActivity.class));
@@ -33,6 +39,12 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(v -> loginUtente());
         pswDim=findViewById(R.id.pswDimenticata);
         pswDim.setOnClickListener(v -> reimpostaPassword());
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main_login), (v, insets) -> {
+            Insets systemBars=insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
     }
 
     private void reimpostaPassword() {

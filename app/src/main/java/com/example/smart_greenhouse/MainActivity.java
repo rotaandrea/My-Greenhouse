@@ -1,10 +1,15 @@
 package com.example.smart_greenhouse;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -12,6 +17,8 @@ import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -25,12 +32,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
+
 public class MainActivity extends AppCompatActivity{
-    Button btnIrrigazioneON, btnIrrigazioneOFF, btnAutoOFF, btnAutoON;
-    ImageView imgMascotte, imgStatoPianta;
+    ImageView imgMascotte, imgStatoPianta, imgIrrigazione, imgAuto;
+    //Button btnHome, btnStorico;
     TextView txtUmidita, txtStatoPianta;
-    MaterialCardView btnLog;
+    MaterialCardView btnIrrigazione, btnAuto, btnLogout;
+    FrameLayout btnStorico;
+
     boolean buio_status=false;
+    int percentuale;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -43,13 +55,24 @@ public class MainActivity extends AppCompatActivity{
             return;
         }
         setContentView(R.layout.activity_main);
+        com.google.firebase.messaging.FirebaseMessaging.getInstance().subscribeToTopic("serra_alert").addOnCompleteListener(task -> {
+            if(task.isSuccessful()){
+                Log.d("notifiche", "iscritto al canale notifiche");
+                if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.TIRAMISU){
+                    if(ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)!=PackageManager.PERMISSION_GRANTED){
+                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 101);
+                    }
+                }
+            }
+        });
 
-        btnIrrigazioneON=findViewById(R.id.btnIrrigazioneON);
-        btnIrrigazioneOFF=findViewById(R.id.btnIrrigazioneOFF);
+        btnIrrigazione=findViewById(R.id.btnIrrigazioneContainer);
+        btnAuto=findViewById(R.id.btnAutoContainer);
 
-        btnAutoOFF=findViewById(R.id.btnAutoOFF);
-        btnAutoON=findViewById(R.id.btnAutoON);
-        btnLog=findViewById(R.id.btnLogout);
+        imgIrrigazione=findViewById(R.id.imgIrrigazione);
+        imgAuto=findViewById(R.id.imgAuto);
+
+        btnLogout =findViewById(R.id.btnLogout);
 
         imgMascotte=findViewById(R.id.imageViewMascotte);
         imgStatoPianta=findViewById(R.id.imageStatus);
@@ -58,89 +81,80 @@ public class MainActivity extends AppCompatActivity{
 
         attivaListener();
 
-        btnLog.setOnClickListener(view -> {
-            FirebaseAuth.getInstance().signOut();
-            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-            startActivity(intent);
-            finish();
-        });
-
-        //attiva irrigazione
-        btnIrrigazioneOFF.setOnClickListener(view -> {
+        btnIrrigazione.setOnClickListener(v -> {
             DatabaseReference refPompa=FirebaseDatabase.getInstance().getReference("umidita/pompa_status");
             refPompa.get().addOnCompleteListener(task -> {
                 if(task.isSuccessful()){
                     DataSnapshot dataSnapshot=task.getResult();
                     if(dataSnapshot.exists()){
                         String status=dataSnapshot.getValue(String.class);
-                        Log.d("firebase", "Auto: "+status);
-                        refPompa.setValue("OFF"); // Accendi l'automazione
-                        btnIrrigazioneOFF.setVisibility(View.GONE);  // Nascondi questo bottone
-                        btnIrrigazioneON.setVisibility(View.VISIBLE); // Fai apparire la Pausa Rossa
+                        Log.d("firebase", "auto: "+status);
+                        String nextStatus="";
+                        switch(status){
+                            case "OFF":
+                                nextStatus="ON";
+                                refPompa.setValue(nextStatus); // Accendi l'automazione
+                                //imgIrrigazione.setImageResource(R.drawable.ic_pause);
+                                imgIrrigazione.setImageTintList(ColorStateList.valueOf(Color.parseColor("#0F8B7D")));
+                                btnIrrigazione.setCardBackgroundColor(Color.WHITE);
+                                btnIrrigazione.setCardElevation(4f);
+                                break;
+
+                            case "ON":
+                                nextStatus="OFF";
+                                refPompa.setValue("OFF"); // Accendi l'automazione
+                                //imgIrrigazione.setImageResource(R.drawable.ic_water_drop);
+                                imgIrrigazione.setImageTintList(ColorStateList.valueOf(Color.WHITE));
+                                btnIrrigazione.setCardBackgroundColor(Color.parseColor("#0F8B7D"));
+                                btnIrrigazione.setCardElevation(0f);
+                                break;
+                        }
+                        HashMap<String, Object> hm=new LogEvento(Funzione.IRRIGAZIONE, nextStatus).toHashMap();
+                        mandaEventoDb(hm);
+
                     }
-                    else Log.d("firebase", "Errore database: nessun valore trovato");
+                    else Log.d("firebase", "errore database: nessun valore trovato");
                 }
-                else Log.d("firebase", "Errore di connessione", task.getException());
-            });
-        });
-        //disattiva irrigazione
-        btnIrrigazioneON.setOnClickListener(view -> {
-            DatabaseReference refPompa=FirebaseDatabase.getInstance().getReference("umidita/pompa_status");
-            refPompa.get().addOnCompleteListener(task -> {
-                if(task.isSuccessful()){
-                    DataSnapshot dataSnapshot=task.getResult();
-                    if(dataSnapshot.exists()){
-                        String status=dataSnapshot.getValue(String.class);
-                        Log.d("firebase", "Auto: "+status);
-                        refPompa.setValue("ON"); // Accendi l'automazione
-                        btnIrrigazioneON.setVisibility(View.GONE);  // Nascondi questo bottone
-                        btnIrrigazioneOFF.setVisibility(View.VISIBLE); // Fai apparire la Pausa Rossa
-                    }
-                    else Log.d("firebase", "Errore database: nessun valore trovato");
-                }
-                else Log.d("firebase", "Errore di connessione", task.getException());
+                else Log.d("firebase", "errore di connessione", task.getException());
             });
         });
 
-        //attiva auto
-        btnAutoOFF.setOnClickListener(view -> {
+        btnAuto.setOnClickListener(v -> {
             DatabaseReference refAuto=FirebaseDatabase.getInstance().getReference("auto_status");
             refAuto.get().addOnCompleteListener(task -> {
                 if(task.isSuccessful()){
                     DataSnapshot dataSnapshot=task.getResult();
                     if(dataSnapshot.exists()){
                         boolean status=dataSnapshot.getValue(Boolean.class);
-                        Log.d("firebase", "Auto: "+status);
-                        refAuto.setValue(true); // Accendi l'automazione
-                        btnAutoOFF.setVisibility(View.GONE);  // Nascondi questo bottone
-                        btnAutoON.setVisibility(View.VISIBLE); // Fai apparire la Pausa Rossa
+                        Log.d("firebase", "auto: "+status);
+                        String nextStatus="";
+                        if(status){
+                            nextStatus="OFF";
+                            refAuto.setValue(false); // Accendi l'automazione
+                            //imgIrrigazione.setImageResource(R.drawable.ic_pause);
+                            imgAuto.setImageTintList(ColorStateList.valueOf(Color.parseColor("#0F8B7D")));
+                            btnAuto.setCardBackgroundColor(Color.WHITE);
+                            btnAuto.setCardElevation(4f);
+                        }
+                        else{
+                            nextStatus="ON";
+                            refAuto.setValue(true); // Spegni l'automazione
+                            //imgIrrigazione.setImageResource(R.drawable.ic_water_drop);
+                            imgAuto.setImageTintList(ColorStateList.valueOf(Color.WHITE));
+                            btnAuto.setCardBackgroundColor(Color.parseColor("#33FFFFFF"));
+                            btnAuto.setCardElevation(0f);
+                        }
+                        HashMap<String, Object> hm=new LogEvento(Funzione.AUTO, nextStatus).toHashMap();
+                        mandaEventoDb(hm);
+
                     }
-                    else Log.d("firebase", "Errore database: nessun valore trovato");
+                    else Log.d("firebase", "errore database: nessun valore trovato");
                 }
-                else Log.d("firebase", "Errore di connessione", task.getException());
-            });
-        });
-        //disattiva auto
-        btnAutoON.setOnClickListener(view -> {
-            DatabaseReference refAuto=FirebaseDatabase.getInstance().getReference("auto_status");
-            refAuto.get().addOnCompleteListener(task -> {
-                if(task.isSuccessful()){
-                    DataSnapshot dataSnapshot=task.getResult();
-                    if(dataSnapshot.exists()){
-                        boolean status=dataSnapshot.getValue(Boolean.class);
-                        Log.d("firebase", "Auto: "+status);
-                        refAuto.setValue(false); // Spegni l'automazione (ERRORE CORRETTO: prima c'era true)
-                        btnAutoON.setVisibility(View.GONE); // Nascondi la pausa rossa
-                        btnAutoOFF.setVisibility(View.VISIBLE); // Fai riapparire il bianco
-                    }
-                    else Log.d("firebase", "Errore database: nessun valore trovato");
-                }
-                else Log.d("firebase", "Errore di connessione", task.getException());
+                else Log.d("firebase", "errore di connessione", task.getException());
             });
         });
 
-        //logout
-        btnLog.setOnClickListener(view -> {
+        btnLogout.setOnClickListener(view -> {
             try{
                 FirebaseAuth.getInstance().signOut();
                 Intent intent=new Intent(MainActivity.this, LoginActivity.class);
@@ -152,13 +166,22 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
+        //barra
+        btnStorico=findViewById(R.id.btnStorico);
+        btnStorico.setOnClickListener(v -> {
+            Intent intent=new Intent(MainActivity.this, StoricoActivity.class);
+            startActivity(intent);
+            overridePendingTransition(0, 0);
+            finish();
+        });
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars=insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
     }
-     private void attivaListener(){
+    private void attivaListener(){
         DatabaseReference refAuto=FirebaseDatabase.getInstance().getReference("auto_status");
         DatabaseReference refUmidita=FirebaseDatabase.getInstance().getReference("umidita");
         DatabaseReference refLuci=FirebaseDatabase.getInstance().getReference("luci");
@@ -170,14 +193,16 @@ public class MainActivity extends AppCompatActivity{
                 if(snapshot.exists()){
                     boolean status=snapshot.getValue(Boolean.class);
                     if(status){
-                        btnAutoOFF.setVisibility(View.GONE);
-                        btnAutoON.setVisibility(View.VISIBLE);
+                        imgAuto.setImageTintList(ColorStateList.valueOf(Color.parseColor("#0F8B7D")));
+                        btnAuto.setCardBackgroundColor(Color.WHITE);
+                        btnAuto.setCardElevation(4f);
                         Log.d("firebase", "auto on");
                     }
                     else{
-                        btnAutoOFF.setVisibility(View.VISIBLE);
-                        btnAutoON.setVisibility(View.GONE);
-                        Log.d("firebase", "auto on");
+                        imgAuto.setImageTintList(ColorStateList.valueOf(Color.WHITE));
+                        btnAuto.setCardBackgroundColor(Color.parseColor("#33FFFFFF"));
+                        btnAuto.setCardElevation(0f);
+                        Log.d("firebase", "auto off");
                     }
                 }
             }
@@ -227,7 +252,7 @@ public class MainActivity extends AppCompatActivity{
             String chiave=snapshot.getKey();
             switch(chiave){
                 case "sensore":
-                    int percentuale=snapshot.getValue(Integer.class);
+                    percentuale=snapshot.getValue(Integer.class);
                     txtUmidita.setText(percentuale+"%");
                     if(percentuale<60){
                         imgMascotte.setImageResource(R.mipmap.secco);
@@ -250,23 +275,17 @@ public class MainActivity extends AppCompatActivity{
                     String status=snapshot.getValue(String.class);
                     switch(status){
                         case "ON":
-                            btnIrrigazioneON.setVisibility(View.GONE);
-                            btnIrrigazioneOFF.setVisibility(View.VISIBLE);
+                            imgIrrigazione.setImageTintList(ColorStateList.valueOf(Color.parseColor("#0F8B7D")));
+                            btnIrrigazione.setCardBackgroundColor(Color.WHITE);
+                            btnIrrigazione.setCardElevation(4f);
                             Log.d("firebase", "irrigazione on");
                             imgMascotte.setImageResource(R.mipmap.irrigazione);
                             break;
                         case "OFF":
-                            btnIrrigazioneOFF.setVisibility(View.GONE);
-                            btnIrrigazioneON.setVisibility(View.VISIBLE);
+                            imgIrrigazione.setImageTintList(ColorStateList.valueOf(Color.WHITE));
+                            btnIrrigazione.setCardBackgroundColor(Color.parseColor("#33FFFFFF"));
+                            btnIrrigazione.setCardElevation(0f);
                             Log.d("firebase", "irrigazione off");
-                            String soloNumeri=txtUmidita.getText().toString().replace("%", "").trim();
-                            try{
-                                percentuale=Integer.parseInt(soloNumeri);
-                                Log.d("debug", "percentuale: "+percentuale);
-                            }catch (NumberFormatException e){
-                                percentuale=-1;
-                                Log.e("errore", "impossibile convertire: "+soloNumeri);
-                            }
                             if(percentuale<60) imgMascotte.setImageResource(R.mipmap.secco);
                             else imgMascotte.setImageResource(R.mipmap.normale);
                             break;
@@ -294,5 +313,10 @@ public class MainActivity extends AppCompatActivity{
                     }
             }
         }
+    }
+    private void mandaEventoDb(HashMap<String, Object> evento){
+        DatabaseReference refEventi=FirebaseDatabase.getInstance().getReference("eventi");
+        String id=refEventi.push().getKey();
+        refEventi.child(id).setValue(evento);
     }
 }

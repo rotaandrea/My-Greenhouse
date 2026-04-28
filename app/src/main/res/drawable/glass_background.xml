@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Colore di base semi-trasparente per l'effetto "Glass" (es. bianco al 70%) -->
-    <solid android:color="#B3FFFFFF"/>
+    <!-- Colore nero/scuro semi-trasparente per l'effetto Glass Mimetico di Instagram -->
+    <solid android:color="#991C1C1E"/>
     
-    <!-- Bordo superiore leggerissimo per dare l'effetto luce "Liquid" in stile iOS -->
-    <stroke 
-        android:width="1dp" 
-        android:color="#4DFFFFFF"/>
+    <!-- Bordi completamente arrotondati (a "pillola") -->
+    <corners android:radius="40dp"/>
 
-    <!-- Se la vuoi completamente dritta (da bordo a bordo),
-         non mettiamo i <corners>, oppure se la vuoi staccata dal fondo,
-         puoi scommentare la riga sotto: -->
-    <!-- <corners android:topLeftRadius="25dp" android:topRightRadius="25dp"/> -->
+    <!-- Un bordino sottilissimo per dare l'effetto di riflesso del vetro -->
+    <stroke 
+        android:width="0.5dp" 
+        android:color="#4DFFFFFF"/>
 </shape>
