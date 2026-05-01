@@ -8,7 +8,6 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -35,10 +34,10 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity{
-    ImageView imgMascotte, imgStatoPianta, imgIrrigazione, imgAuto;
+    ImageView imgMascotte, imgStatoPianta, imgIrrigazione, imgAuto, imgLuci;
     //Button btnHome, btnStorico;
     TextView txtUmidita, txtStatoPianta;
-    MaterialCardView btnIrrigazione, btnAuto, btnLogout;
+    MaterialCardView btnIrrigazione, btnAuto, btnLuci, btnLogout;
     FrameLayout btnStorico;
 
     boolean buio_status=false;
@@ -48,13 +47,14 @@ public class MainActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_main);
+
         if(FirebaseAuth.getInstance().getCurrentUser()==null){
             Intent intent=new Intent(this, LoginActivity.class);
             startActivity(intent);
             finish();
             return;
         }
-        setContentView(R.layout.activity_main);
         com.google.firebase.messaging.FirebaseMessaging.getInstance().subscribeToTopic("serra_alert").addOnCompleteListener(task -> {
             if(task.isSuccessful()){
                 Log.d("notifiche", "iscritto al canale notifiche");
@@ -68,9 +68,11 @@ public class MainActivity extends AppCompatActivity{
 
         btnIrrigazione=findViewById(R.id.btnIrrigazioneContainer);
         btnAuto=findViewById(R.id.btnAutoContainer);
+        btnLuci=findViewById(R.id.btnLuciContainer);
 
         imgIrrigazione=findViewById(R.id.imgIrrigazione);
         imgAuto=findViewById(R.id.imgAuto);
+        imgLuci=findViewById(R.id.imgLuci);
 
         btnLogout =findViewById(R.id.btnLogout);
 
@@ -145,6 +147,43 @@ public class MainActivity extends AppCompatActivity{
                             btnAuto.setCardElevation(0f);
                         }
                         HashMap<String, Object> hm=new LogEvento(Funzione.AUTO, nextStatus).toHashMap();
+                        mandaEventoDb(hm);
+
+                    }
+                    else Log.d("firebase", "errore database: nessun valore trovato");
+                }
+                else Log.d("firebase", "errore di connessione", task.getException());
+            });
+        });
+
+        btnLuci.setOnClickListener(v -> {
+            DatabaseReference refLuci=FirebaseDatabase.getInstance().getReference("luci/led_status");
+            refLuci.get().addOnCompleteListener(task -> {
+                if(task.isSuccessful()){
+                    DataSnapshot dataSnapshot=task.getResult();
+                    if(dataSnapshot.exists()){
+                        String status=dataSnapshot.getValue(String.class);
+                        Log.d("firebase", "luci: "+status);
+                        String nextStatus="";
+                        switch(status){
+                            case "OFF":
+                                nextStatus="ON";
+                                refLuci.setValue(nextStatus); // Accendi l'automazione
+                                imgLuci.setImageTintList(ColorStateList.valueOf(Color.parseColor("#0F8B7D")));
+                                btnLuci.setCardBackgroundColor(Color.WHITE);
+                                btnLuci.setCardElevation(4f);
+                                break;
+
+                            case "ON":
+                                nextStatus="OFF";
+                                refLuci.setValue("OFF"); // Accendi l'automazione
+                                //imgIrrigazione.setImageResource(R.drawable.ic_water_drop);
+                                imgLuci.setImageTintList(ColorStateList.valueOf(Color.WHITE));
+                                btnLuci.setCardBackgroundColor(Color.parseColor("#0F8B7D"));
+                                btnLuci.setCardElevation(0f);
+                                break;
+                        }
+                        HashMap<String, Object> hm=new LogEvento(Funzione.LUCI, nextStatus).toHashMap();
                         mandaEventoDb(hm);
 
                     }
@@ -306,9 +345,17 @@ public class MainActivity extends AppCompatActivity{
                     switch(status){
                         case "ON":
                             imgMascotte.setImageResource(R.mipmap.normale);
+                            imgLuci.setImageTintList(ColorStateList.valueOf(Color.parseColor("#0F8B7D")));
+                            btnLuci.setCardBackgroundColor(Color.WHITE);
+                            btnLuci.setCardElevation(4f);
+                            Log.d("firebase", "luci on");
                             break;
                         case "OFF":
                             if(buio_status) imgMascotte.setImageResource(R.mipmap.notte);
+                            imgLuci.setImageTintList(ColorStateList.valueOf(Color.WHITE));
+                            btnLuci.setCardBackgroundColor(Color.parseColor("#33FFFFFF"));
+                            btnLuci.setCardElevation(0f);
+                            Log.d("firebase", "luci off");
                             break;
                     }
             }

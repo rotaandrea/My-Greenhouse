@@ -91,7 +91,6 @@ public class StoricoActivity extends AppCompatActivity{
                 listaLog.add(0, nuovo);
             }
             adapter.notifyItemInserted(0);
-
         }
     }
 

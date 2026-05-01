@@ -28,9 +28,17 @@ public class LogAdapter extends RecyclerView.Adapter<LogAdapter.LogViewHolder> {
             holder.txtDettagli.setText("STATO IRRIGAZIONE - "+log.getStato());
             holder.imgEvento.setImageResource(R.drawable.ic_water_drop);
         }
-        else{
+        else if(log.getTipoEvento().equals(Funzione.AUTO)){
             holder.txtDettagli.setText("STATO AUTOMATICO - "+log.getStato());
             holder.imgEvento.setImageResource(R.drawable.ic_automatic_mode);
+        }
+        else if(log.getTipoEvento().equals(Funzione.LUCI)){
+            holder.txtDettagli.setText("STATO LED - "+log.getStato());
+            holder.imgEvento.setImageResource(R.drawable.ic_lightbulb);
+        }
+        else {
+            holder.txtDettagli.setText("ALLARME UMIDITÀ - "+log.getStato());
+            holder.imgEvento.setImageResource(R.drawable.ic_warning_circle);
         }
     }
 

@@ -95,11 +95,12 @@
             android:id="@+id/statusText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-medium"
+            android:fontFamily="@font/sf_armenian_rounded"
             android:letterSpacing="0.02"
             android:text="TUTTO BENE"
             android:textColor="#FFFFFF"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <!-- Card principale Umidità in Vetro Smerigliato -->
@@ -132,7 +133,7 @@
                 android:id="@+id/textPercentualeUmid"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
+                android:fontFamily="@font/sf_armenian_rounded"
                 android:includeFontPadding="false"
                 android:shadowColor="#26000000"
                 android:shadowDx="0"
@@ -140,17 +141,18 @@
                 android:shadowRadius="10"
                 android:text="80%"
                 android:textColor="#FFFFFF"
-                android:textSize="58sp" />
+                android:textSize="58sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/textLabelUmid"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/sf_armenian_rounded"
                 android:letterSpacing="0.05"
                 android:text="Umidità Attuale"
                 android:textColor="#E0F2F1"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textSize="16sp" />
 
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
@@ -176,10 +178,12 @@
             android:id="@+id/btnIrrigazioneContainer"
             android:layout_width="64dp"
             android:layout_height="64dp"
-            android:layout_marginEnd="32dp"
+            android:layout_marginEnd="24dp"
             app:cardBackgroundColor="#33FFFFFF"
             app:cardCornerRadius="32dp"
-            app:cardElevation="0dp"
+            app:cardElevation="6dp"
+            android:outlineAmbientShadowColor="#4D000000"
+            android:outlineSpotShadowColor="#4D000000"
             app:strokeColor="#FFFFFF"
             app:strokeWidth="1.5dp"
             android:clickable="true"
@@ -202,9 +206,12 @@
             android:id="@+id/btnAutoContainer"
             android:layout_width="64dp"
             android:layout_height="64dp"
+            android:layout_marginEnd="24dp"
             app:cardBackgroundColor="#33FFFFFF"
             app:cardCornerRadius="32dp"
-            app:cardElevation="0dp"
+            app:cardElevation="6dp"
+            android:outlineAmbientShadowColor="#4D000000"
+            android:outlineSpotShadowColor="#4D000000"
             app:strokeColor="#FFFFFF"
             app:strokeWidth="1.5dp"
             android:clickable="true"
@@ -217,6 +224,33 @@
                 android:layout_height="32dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_automatic_mode"
+                app:tint="#FFFFFF"
+                android:clickable="false"
+                android:focusable="false"/>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Pulsante Luci Circolare -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnLuciContainer"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            app:cardBackgroundColor="#33FFFFFF"
+            app:cardCornerRadius="32dp"
+            app:cardElevation="6dp"
+            android:outlineAmbientShadowColor="#4D000000"
+            android:outlineSpotShadowColor="#4D000000"
+            app:strokeColor="#FFFFFF"
+            app:strokeWidth="1.5dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
+
+            <ImageView
+                android:id="@+id/imgLuci"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_lightbulb"
                 app:tint="#FFFFFF"
                 android:clickable="false"
                 android:focusable="false"/>
