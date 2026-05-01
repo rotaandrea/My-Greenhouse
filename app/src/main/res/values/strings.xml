@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">Smart Greenhouse</string>
-    <string name="connessione_db">Connessione alla Serra...</string>
+    <string name="app_name">My Greénhouse</string>
+    <string name="connessione_db">Connessione alla tua serra...</string>
 </resources>

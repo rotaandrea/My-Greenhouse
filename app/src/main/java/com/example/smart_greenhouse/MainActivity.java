@@ -34,6 +34,18 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 
+/**
+ * Activity principale dell'applicazione My Greénhouse.
+ * Funge da pannello di controllo (dashboard) per l'utente,
+ * mostrando in tempo reale il valore dell'umidità del terreno
+ * della cultura, e permettendo il controllo manuale della pompa
+ * di irrigazione, delle luci e della modalità automatica.
+ *
+ * @author Andrea Rota
+ * @author Andrea Pedrali
+ * @author Claudio Carminati
+ * @author Filippo Vezzoli
+ */
 public class MainActivity extends AppCompatActivity{
     ImageView imgMascotte, imgStatoPianta, imgIrrigazione, imgAuto, imgLuci;
     TextView txtUmidita, txtStatoPianta;
@@ -46,6 +58,17 @@ public class MainActivity extends AppCompatActivity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
+        /**
+         * Metodo chiamato alla creazione dell'Activity.
+         * Inizializza l'interfaccia grafica e gestisce la schermata di caricamento.
+         * Verifica l'autenticazione dell'utente tramite FirebaseAuth e configura
+         * il canale delle notifiche.
+         * Gestisce inflating collegando gli elementi UI (MaterialCardView, FrameLayout,
+         * ImageView, TextView) e imposta i listener per le interazioni dell'utente (luci,
+         * automazione, irrigazione e barra di navigazione inferiore).
+         *
+         * @param saveInstanceState Stato precedente salvato dell'applicazione.
+         */
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
@@ -76,6 +99,7 @@ public class MainActivity extends AppCompatActivity{
         imgLuci=findViewById(R.id.imgLuci);
 
         btnLogout =findViewById(R.id.btnLogout);
+        btnStorico=findViewById(R.id.btnStorico);
 
         imgMascotte=findViewById(R.id.imageViewMascotte);
         imgStatoPianta=findViewById(R.id.imageStatus);
@@ -213,8 +237,6 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
-        //barra
-        btnStorico=findViewById(R.id.btnStorico);
         btnStorico.setOnClickListener(v -> {
             Intent intent=new Intent(MainActivity.this, StoricoActivity.class);
             startActivity(intent);
@@ -229,6 +251,12 @@ public class MainActivity extends AppCompatActivity{
         });
     }
     private void attivaListener(){
+        /**
+         * Si collega al Firebase Realtime Database e imposta dei listener
+         * che rimangono in ascolto continuo. Ogni volta che c'è un cambiamento di stato
+         * (es. variazione dell'umidità, accensione delle luci o stato automazione),
+         * aggiorna l'interfaccia dell'app in tempo reale.
+         */
         DatabaseReference refAuto=FirebaseDatabase.getInstance().getReference("auto_status");
         DatabaseReference refUmidita=FirebaseDatabase.getInstance().getReference("umidita");
         DatabaseReference refLuci=FirebaseDatabase.getInstance().getReference("luci");
@@ -295,6 +323,15 @@ public class MainActivity extends AppCompatActivity{
          });
     }
     private void cambiamentiUmidita(@NonNull DataSnapshot snapshot){
+        /**
+         * Gestisce i dati in arrivo da Firebase riguardanti il terreno.
+         * Aggiorna il testo a schermo con la percentuale di umidità e cambia
+         * l'espressione della mascotte (normale o secco) e l'icona di stato
+         * se la percentuale scende sotto soglie di allarme (es. sotto il 60%).
+         *
+         * @param snapshot Il pacchetto di dati aggiornato ricevuto dal database.
+         */
+
         nascondiCaricamento();
         if(snapshot.exists()){
             String chiave=snapshot.getKey();
@@ -342,6 +379,13 @@ public class MainActivity extends AppCompatActivity{
         }
     }
     private void cambiamentiLuci(@NonNull DataSnapshot snapshot){
+        /**
+         * Gestisce l'aggiornamento dell'interfaccia grafica in base allo stato
+         * dell'illuminazione (LED) e al sensore di luminosità (buio).
+         *
+         * @param snapshot Il pacchetto di dati aggiornato ricevuto dal database.
+         */
+
         if(snapshot.exists()){
             String chiave=snapshot.getKey();
             switch(chiave){
@@ -377,11 +421,24 @@ public class MainActivity extends AppCompatActivity{
         }
     }
     private void mandaEventoDb(HashMap<String, Object> evento){
+        /**
+         * Salva un'azione compiuta dall'utente (es. accensione manuale della pompa)
+         * nel nodo "eventi" del Realtime Database, per mantenere uno storico completo delle
+         * attività della serra.
+         *
+         * @param evento Una mappa (HashMap) contenente i dettagli dell'azione da salvare.
+         */
+
         DatabaseReference refEventi=FirebaseDatabase.getInstance().getReference("eventi");
         String id=refEventi.push().getKey();
         refEventi.child(id).setValue(evento);
     }
     private void nascondiCaricamento(){
+        /**
+         * Nasconde la rotella di progresso del caricamento, gestendo anche la
+         * transizione in modo di non avere un risultato scattante
+         */
+
         if(loadingOverlay!=null && loadingOverlay.getVisibility()==View.VISIBLE){
             loadingOverlay.animate().alpha(0f)
                     .setDuration(500)
@@ -389,19 +446,20 @@ public class MainActivity extends AppCompatActivity{
         }
     }
     private void aggiornaMascotte() {
-        if (pompa_status) {
-            // Priorità Massima 1: Se la pompa va, mostra l'irrigazione sempre!
-            imgMascotte.setImageResource(R.mipmap.irrigazione);
-        } else if (buio_status && !luci_status) {
-            // Priorità 2: Se è buio e le luci sono spente, si dorme
-            imgMascotte.setImageResource(R.mipmap.notte);
-        } else if (percentuale < 60) {
-            // Priorità 3: C'è un'allerta siccità
-            imgMascotte.setImageResource(R.mipmap.secco);
-        } else {
-            // Priorità 4: Tutto regolare
-            imgMascotte.setImageResource(R.mipmap.normale);
-        }
+        /**
+         * Calcola l'interazione tra i valori della pompa, del buio, e dell'umidità
+         * in modo da cambiare lo stato della mascotte in base a delle priorità.
+         * Priorità 1: Se la pompa va, mostra l'irrigazione sempre.
+         * Priorità 2: Se è buio e le luci sono spente, la mascotte dorme.
+         * Priorità 3: C'è un'allerta siccità.
+         * Priorità 4: Tutto regolare.
+         */
+
+
+        if (pompa_status) imgMascotte.setImageResource(R.mipmap.irrigazione);
+        else if(buio_status && !luci_status) imgMascotte.setImageResource(R.mipmap.notte);
+        else if(percentuale<60) imgMascotte.setImageResource(R.mipmap.secco);
+        else imgMascotte.setImageResource(R.mipmap.normale);
     }
 
 }

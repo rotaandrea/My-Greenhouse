@@ -15,13 +15,29 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity{
+    /**
+     * Gestisce la schermata di accesso e la sicurezza dell'applicazione.
+     * Si interfaccia con Firebase Authentication per verificare le credenziali
+     * dell'utente, garantendo che solo il proprietario (o chi autorizzato) possa visualizzare
+     * o modificare lo stato della serra. Gestisce inoltre il recupero della password.
+     */
+
     private FirebaseAuth fAuth;
     private EditText emailField, passwordField;
     private Button btnLogin;
     private TextView pswDim;
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState){
+        /**
+         * Inizializza l'interfaccia grafica di login e collega i campi di testo
+         * (email e password) ai rispettivi listener.
+         * Se l'utente ha già effettuato l'accesso in precedenza, può reindirizzarlo
+         * automaticamente alla schermata principale senza reinserire i dati.
+         *
+         * @param savedInstanceState Lo stato precedentemente salvato dell'applicazione.
+         */
+
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
 
@@ -47,7 +63,12 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void reimpostaPassword() {
+    private void reimpostaPassword(){
+        /**
+         * Avvia la procedura di recupero della password.
+         * Verifica che l'utente abbia inserito una mail valida e fa inviare da Firebase
+         * un messaggio automatico con un link sicuro per reimpostare le proprie credenziali.
+         */
         String email=emailField.getText().toString().trim();
         if(email.isEmpty()){
             emailField.setError("Inserisci la tua email per reimpostare la password");
@@ -61,6 +82,15 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void loginUtente(){
+        /**
+         * Preleva le stringhe inserite nei campi di testo (Email e Password),
+         * verifica che non siano vuote e tenta l'autenticazione sicura tramite Firebase.
+         * Gestisce tutte le eccezioni che i metodi di Firebase potrebbero lanciare e
+         * restituisce all'utente un messaggio facilmente interpretabile relativo alla
+         * posizione dell'errore.
+         * Se il login ha successo, apre la Dashboard (MainActivity); in caso contrario,
+         * mostra un messaggio di errore (Toast) per credenziali errate.
+         */
         String email=emailField.getText().toString().trim();
         String password=passwordField.getText().toString().trim();
 

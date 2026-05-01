@@ -21,6 +21,8 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -57,4 +59,10 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+}
+
+tasks.register<Javadoc>("javadocGenerator") {
+    source = fileTree("src/main/java")
+    isFailOnError = false
+    destinationDir = file("$buildDir/outputs/javadoc")
 }

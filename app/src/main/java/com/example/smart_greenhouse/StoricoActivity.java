@@ -29,14 +29,26 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
 
+/**
+ * Activity dedicata alla visualizzazione dello storico degli eventi.
+ * Si collega al nodo 'eventi' del Realtime Database per recuperare
+ * e mostrare in ordine cronologico tutte le azioni passate (accensione
+ * luci o pompa, attivazione modalità automatica e notifiche ricevute),
+ * permettendo all'utente di tener traccia dei cambiamenti della serra.
+ */
 public class StoricoActivity extends AppCompatActivity{
-
     private RecyclerView recyclerView;
     private LogAdapter adapter;
     ArrayList<LogEvento> listaLog=new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
+        /**
+         * Inizializza l'interfaccia grafica (RecyclerView) e avvia
+         * il caricamento dei log da Firebase, ordinandoli per mostrarli a schermo.
+         *
+         * @param saveInstanceState Stato precedente salvato dell'applicazione.
+         */
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_storico);
@@ -53,7 +65,7 @@ public class StoricoActivity extends AppCompatActivity{
             btnSerra.setOnClickListener(v -> {
                 Intent intent=new Intent(StoricoActivity.this, MainActivity.class);
                 startActivity(intent);
-                overridePendingTransition(0, 0); // Effetto tab iOS
+                overridePendingTransition(0, 0);
                 finish();
             });
         }
@@ -65,6 +77,12 @@ public class StoricoActivity extends AppCompatActivity{
         });
     }
     private void attivaListener(){
+        /**
+         * Si collega al Firebase Realtime Database e imposta il listener
+         * che rimane in ascolto continuo, sul nodo 'eventi. Ogni volta che c'è un cambiamento
+         * di stato aggiorna l'interfaccia dell'app in tempo reale, attraverso il metodo
+         * importaEventi()
+         */
         DatabaseReference refEventi=FirebaseDatabase.getInstance().getReference("eventi");
         Query limite=refEventi.orderByKey().limitToLast(250);
         limite.addChildEventListener(new ChildEventListener() {
@@ -82,7 +100,15 @@ public class StoricoActivity extends AppCompatActivity{
             public void onCancelled(@NonNull DatabaseError error) {}
         });
     }
-    private void importaEventi(DataSnapshot snapshot){
+    private void importaEventi(@NonNull DataSnapshot snapshot){
+        /**
+         * Attraverso lo snapshot ricevuto in ingresso, ricava i dati degli eventi
+         * sottoforma di HashMap da Firebase, crea un nuovo un nuovo logEvento usando
+         * il metodo statico creaLogDaHashMap(), lo inserisce nella lista dei log (ArrayList<LogEvento)
+         * e notifica l'adapter che un nuovo elemento è stato inserito in cima.
+         *
+         * @param snapshot Il pacchetto di dati aggiornato ricevuto dal database.
+         */
         if(snapshot.exists()){
             String chiave=snapshot.getKey();
             HashMap<String, Object> hm=(HashMap<String, Object>) snapshot.getValue();

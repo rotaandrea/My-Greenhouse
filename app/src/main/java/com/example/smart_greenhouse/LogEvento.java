@@ -8,6 +8,14 @@ import java.util.HashMap;
 import java.util.zip.DataFormatException;
 
 public class LogEvento{
+    /**
+     * Classe modello (Data Class) che rappresenta un singolo evento nello storico.
+     * Contiene le informazioni fondamentali: il tipo di funzione, il nuovo stato (es. ON/OFF)
+     * e la data/ora esatta in cui è avvenuto.
+     * Viene utilizzata per inviare e leggere i dati in modo strutturato da Firebase,
+     * grazie al metodo statico creaLogDaHashMap().
+     */
+
     private String stato;
     private Funzione tipoEvento;
     private LocalDateTime timestap;
