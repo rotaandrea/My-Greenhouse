@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -35,12 +36,12 @@ import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity{
     ImageView imgMascotte, imgStatoPianta, imgIrrigazione, imgAuto, imgLuci;
-    //Button btnHome, btnStorico;
     TextView txtUmidita, txtStatoPianta;
     MaterialCardView btnIrrigazione, btnAuto, btnLuci, btnLogout;
     FrameLayout btnStorico;
+    View loadingOverlay;
 
-    boolean buio_status=false;
+    boolean buio_status=false, luci_status=false, pompa_status=false;
     int percentuale;
 
     @Override
@@ -81,6 +82,8 @@ public class MainActivity extends AppCompatActivity{
         txtUmidita=findViewById(R.id.textPercentualeUmid);
         txtStatoPianta=findViewById(R.id.statusText);
 
+        loadingOverlay =findViewById(R.id.loadingOverlay);
+
         attivaListener();
 
         btnIrrigazione.setOnClickListener(v -> {
@@ -95,8 +98,8 @@ public class MainActivity extends AppCompatActivity{
                         switch(status){
                             case "OFF":
                                 nextStatus="ON";
-                                refPompa.setValue(nextStatus); // Accendi l'automazione
-                                //imgIrrigazione.setImageResource(R.drawable.ic_pause);
+                                pompa_status=true;
+                                refPompa.setValue(nextStatus);
                                 imgIrrigazione.setImageTintList(ColorStateList.valueOf(Color.parseColor("#0F8B7D")));
                                 btnIrrigazione.setCardBackgroundColor(Color.WHITE);
                                 btnIrrigazione.setCardElevation(4f);
@@ -104,8 +107,8 @@ public class MainActivity extends AppCompatActivity{
 
                             case "ON":
                                 nextStatus="OFF";
-                                refPompa.setValue("OFF"); // Accendi l'automazione
-                                //imgIrrigazione.setImageResource(R.drawable.ic_water_drop);
+                                pompa_status=false;
+                                refPompa.setValue("OFF");
                                 imgIrrigazione.setImageTintList(ColorStateList.valueOf(Color.WHITE));
                                 btnIrrigazione.setCardBackgroundColor(Color.parseColor("#0F8B7D"));
                                 btnIrrigazione.setCardElevation(0f);
@@ -168,7 +171,10 @@ public class MainActivity extends AppCompatActivity{
                         switch(status){
                             case "OFF":
                                 nextStatus="ON";
-                                refLuci.setValue(nextStatus); // Accendi l'automazione
+                                refLuci.setValue(nextStatus);
+
+                                aggiornaMascotte();
+
                                 imgLuci.setImageTintList(ColorStateList.valueOf(Color.parseColor("#0F8B7D")));
                                 btnLuci.setCardBackgroundColor(Color.WHITE);
                                 btnLuci.setCardElevation(4f);
@@ -176,8 +182,10 @@ public class MainActivity extends AppCompatActivity{
 
                             case "ON":
                                 nextStatus="OFF";
-                                refLuci.setValue("OFF"); // Accendi l'automazione
-                                //imgIrrigazione.setImageResource(R.drawable.ic_water_drop);
+                                refLuci.setValue("OFF");
+
+                                aggiornaMascotte();
+
                                 imgLuci.setImageTintList(ColorStateList.valueOf(Color.WHITE));
                                 btnLuci.setCardBackgroundColor(Color.parseColor("#0F8B7D"));
                                 btnLuci.setCardElevation(0f);
@@ -286,7 +294,8 @@ public class MainActivity extends AppCompatActivity{
              public void onCancelled(@NonNull DatabaseError error){}
          });
     }
-    private void cambiamentiUmidita(DataSnapshot snapshot){
+    private void cambiamentiUmidita(@NonNull DataSnapshot snapshot){
+        nascondiCaricamento();
         if(snapshot.exists()){
             String chiave=snapshot.getKey();
             switch(chiave){
@@ -294,7 +303,6 @@ public class MainActivity extends AppCompatActivity{
                     percentuale=snapshot.getValue(Integer.class);
                     txtUmidita.setText(percentuale+"%");
                     if(percentuale<60){
-                        imgMascotte.setImageResource(R.mipmap.secco);
                         if(percentuale<40){
                             imgStatoPianta.setImageResource(R.drawable.ic_error_circle);
                             txtStatoPianta.setText("UMIDITA' MOLTO BASSA");
@@ -305,53 +313,60 @@ public class MainActivity extends AppCompatActivity{
                         }
                     }
                     else{
-                        imgMascotte.setImageResource(R.mipmap.normale);
                         imgStatoPianta.setImageResource(R.drawable.ic_check_circle);
                         txtStatoPianta.setText("UMIDITA' BUONA");
                     }
+                    aggiornaMascotte();
                     break;
                 case "pompa_status":
                     String status=snapshot.getValue(String.class);
                     switch(status){
                         case "ON":
+                            pompa_status=true;
                             imgIrrigazione.setImageTintList(ColorStateList.valueOf(Color.parseColor("#0F8B7D")));
                             btnIrrigazione.setCardBackgroundColor(Color.WHITE);
                             btnIrrigazione.setCardElevation(4f);
                             Log.d("firebase", "irrigazione on");
-                            imgMascotte.setImageResource(R.mipmap.irrigazione);
+                            aggiornaMascotte();
                             break;
                         case "OFF":
+                            pompa_status=false;
                             imgIrrigazione.setImageTintList(ColorStateList.valueOf(Color.WHITE));
                             btnIrrigazione.setCardBackgroundColor(Color.parseColor("#33FFFFFF"));
                             btnIrrigazione.setCardElevation(0f);
                             Log.d("firebase", "irrigazione off");
-                            if(percentuale<60) imgMascotte.setImageResource(R.mipmap.secco);
-                            else imgMascotte.setImageResource(R.mipmap.normale);
+                            aggiornaMascotte();
                             break;
                     }
             }
         }
     }
-    private void cambiamentiLuci(DataSnapshot snapshot){
+    private void cambiamentiLuci(@NonNull DataSnapshot snapshot){
         if(snapshot.exists()){
             String chiave=snapshot.getKey();
             switch(chiave){
                 case "buio_status":
                     buio_status=snapshot.getValue(Boolean.class);
-                    if(buio_status) imgMascotte.setImageResource(R.mipmap.notte);
+                    aggiornaMascotte();
                     break;
                 case "led_status":
                     String status=snapshot.getValue(String.class);
                     switch(status){
                         case "ON":
-                            imgMascotte.setImageResource(R.mipmap.normale);
+                            luci_status=true;
+
+                            aggiornaMascotte();
+
                             imgLuci.setImageTintList(ColorStateList.valueOf(Color.parseColor("#0F8B7D")));
                             btnLuci.setCardBackgroundColor(Color.WHITE);
                             btnLuci.setCardElevation(4f);
                             Log.d("firebase", "luci on");
                             break;
                         case "OFF":
-                            if(buio_status) imgMascotte.setImageResource(R.mipmap.notte);
+                            luci_status=false;
+
+                            aggiornaMascotte();
+
                             imgLuci.setImageTintList(ColorStateList.valueOf(Color.WHITE));
                             btnLuci.setCardBackgroundColor(Color.parseColor("#33FFFFFF"));
                             btnLuci.setCardElevation(0f);
@@ -366,4 +381,27 @@ public class MainActivity extends AppCompatActivity{
         String id=refEventi.push().getKey();
         refEventi.child(id).setValue(evento);
     }
+    private void nascondiCaricamento(){
+        if(loadingOverlay!=null && loadingOverlay.getVisibility()==View.VISIBLE){
+            loadingOverlay.animate().alpha(0f)
+                    .setDuration(500)
+                    .withEndAction(() -> loadingOverlay.setVisibility(View.GONE));
+        }
+    }
+    private void aggiornaMascotte() {
+        if (pompa_status) {
+            // Priorità Massima 1: Se la pompa va, mostra l'irrigazione sempre!
+            imgMascotte.setImageResource(R.mipmap.irrigazione);
+        } else if (buio_status && !luci_status) {
+            // Priorità 2: Se è buio e le luci sono spente, si dorme
+            imgMascotte.setImageResource(R.mipmap.notte);
+        } else if (percentuale < 60) {
+            // Priorità 3: C'è un'allerta siccità
+            imgMascotte.setImageResource(R.mipmap.secco);
+        } else {
+            // Priorità 4: Tutto regolare
+            imgMascotte.setImageResource(R.mipmap.normale);
+        }
+    }
+
 }

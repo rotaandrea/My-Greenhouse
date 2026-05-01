@@ -37,7 +37,7 @@ public class LogAdapter extends RecyclerView.Adapter<LogAdapter.LogViewHolder> {
             holder.imgEvento.setImageResource(R.drawable.ic_lightbulb);
         }
         else {
-            holder.txtDettagli.setText("ALLARME UMIDITÀ - "+log.getStato());
+            holder.txtDettagli.setText("ALLARME UMIDITÀ - "+log.getStato()+"%");
             holder.imgEvento.setImageResource(R.drawable.ic_warning_circle);
         }
     }
