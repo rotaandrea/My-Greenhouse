@@ -454,8 +454,6 @@ public class MainActivity extends AppCompatActivity{
          * Priorità 3: C'è un'allerta siccità.
          * Priorità 4: Tutto regolare.
          */
-
-
         if (pompa_status) imgMascotte.setImageResource(R.mipmap.irrigazione);
         else if(buio_status && !luci_status) imgMascotte.setImageResource(R.mipmap.notte);
         else if(percentuale<60) imgMascotte.setImageResource(R.mipmap.secco);
