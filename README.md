@@ -157,6 +157,10 @@ My-Greenhouse/
 | Andrea Rota | 4C - ITT |C. Marzoli|
 | Filippo Vezzoli |4C - ITT|C. Marzoli|
 
+---
+
+### Collegamenti
+- [Repository Server e Firmware](https://github.com/rotaandrea/MGH-Backend-Hardware.git)
 
 
 ---
