@@ -13,7 +13,20 @@
           "package_name": "com.example.smart_greenhouse"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "96873550051-0q6p11la9bt48ueh7f4pk0kp2r2hu6na.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.smart_greenhouse",
+            "certificate_hash": "c9400772eb2a6c8b67c12bf3aa5145fbe9bd01d2"
+          }
+        },
+        {
+          "client_id": "96873550051-c5lsfm738t83jhkinut7a678ofi5puau.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBo35yhCSsXfgTn30TQhq3yWoPpTU9lYhc"
@@ -21,7 +34,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "96873550051-c5lsfm738t83jhkinut7a678ofi5puau.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

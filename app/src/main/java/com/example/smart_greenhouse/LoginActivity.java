@@ -117,7 +117,7 @@ public class LoginActivity extends AppCompatActivity{
                 finish();
             }else{
                 try{
-                     throw task.getException(); //lancio per intercettarne il tipo
+                     throw task.getException();
                 }catch(com.google.firebase.auth.FirebaseAuthInvalidUserException e) {
                     //FirebaseAuthInvalidUserException=Email non trovata o account bloccato
                     emailField.setError("Non c'è nessun account con questa email");
