@@ -339,12 +339,12 @@ public class MainActivity extends AppCompatActivity{
                 case "sensore":
                     percentuale=snapshot.getValue(Integer.class);
                     txtUmidita.setText(percentuale+"%");
-                    if(percentuale<60){
-                        if(percentuale<40){
+                    if(percentuale<35){
+                        if(percentuale<25){
                             imgStatoPianta.setImageResource(R.drawable.ic_error_circle);
                             txtStatoPianta.setText("UMIDITA' MOLTO BASSA");
                         }
-                        else if(percentuale>40 && percentuale<60){
+                        else if(percentuale>25 && percentuale<35){
                             imgStatoPianta.setImageResource(R.drawable.ic_warning_circle);
                             txtStatoPianta.setText("UMIDITA' BASSA");
                         }
